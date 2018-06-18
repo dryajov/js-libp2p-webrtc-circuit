@@ -1,0 +1,75 @@
+{
+  "name": "libp2p-webrtc-circuit",
+  "version": "0.1.0",
+  "description": "Use a relayed connection to negotiate a webrtc connection.",
+  "main": "src/index.js",
+  "browser": {
+    "wrtc": false
+  },
+  "scripts": {
+    "lint": "aegir lint",
+    "build": "aegir build",
+    "test": "aegir test --target node --target browser",
+    "test:node": "aegir test --target node",
+    "test:browser": "aegir test --target browser",
+    "release": "aegir test release --target node --target browser",
+    "release-minor": "aegir release --type minor --target node --target browser",
+    "release-major": "aegir release --type major --target node --target browser",
+    "coverage": "aegir coverage",
+    "coverage-publish": "aegir coverage --provider coveralls"
+  },
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/libp2p/js-libp2p-webrtc-circuit.git"
+  },
+  "keywords": [
+    "libp2p",
+    "webrtc",
+    "dial",
+    "stream",
+    "connection",
+    "circuit",
+    "relay"
+  ],
+  "author": "Dmitriy Ryajov <dryajov@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/libp2p/js-libp2p-webrtc-circuit/issues"
+  },
+  "homepage": "https://github.com/libp2p/js-libp2p-webrtc-circuit#readme",
+  "devDependencies": {
+    "aegir": "^13.0.6",
+    "chai": "^4.1.2",
+    "dirty-chai": "^2.0.1",
+    "gulp": "^3.9.1",
+    "libp2p": "^0.20.4",
+    "libp2p-mplex": "^0.7.0",
+    "libp2p-secio": "^0.10.0",
+    "libp2p-tcp": "^0.12.0",
+    "libp2p-websockets": "^0.12.0",
+    "multiaddr": "^4.0.0",
+    "peer-id": "^0.10.7",
+    "peer-info": "^0.14.1",
+    "pre-commit": "^1.2.2",
+    "webrtcsupport": "^2.2.0"
+  },
+  "dependencies": {
+    "class-is": "^1.1.0",
+    "concat-stream": "^1.6.2",
+    "detect-node": "^2.0.3",
+    "interface-connection": "~0.3.2",
+    "mafmt": "^6.0.0",
+    "multibase": "~0.4.0",
+    "once": "^1.4.0",
+    "pull-stream": "^3.6.8",
+    "pull-through": "^1.0.18",
+    "request": "^2.85.0",
+    "simple-peer": "9.0.0",
+    "stream-to-pull-stream": "^1.7.2",
+    "wrtc": "0.1.1"
+  }
+}
