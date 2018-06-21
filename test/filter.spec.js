@@ -27,7 +27,7 @@ describe('filter', () => {
 
   it('filter a single addr for this transport', () => {
     const wd = new WebRTCDirect()
-    const ma = multiaddr('/ip4/127.0.0.1/tcp/9090/http/p2p-webrtc-circuit')
+    const ma = multiaddr('/ip4/127.0.0.1/tcp/9090/http/p2p-webrtc-circuit/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSoooo4')
 
     const filtered = wd.filter(ma)
     expect(filtered.length).to.equal(1)

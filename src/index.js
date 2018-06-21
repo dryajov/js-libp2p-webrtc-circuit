@@ -37,6 +37,11 @@ class WebRTCCircuit {
       options = {}
     }
 
+    ma = multiaddr(ma)
+    if (!ma.getPeerId()) {
+      return callback(new Error('/ipfs/<id> is required!'))
+    }
+
     callback = once(callback || noop)
 
     options = Object.assign({}, options, {
@@ -55,8 +60,8 @@ class WebRTCCircuit {
     pull(conn, block({ size: 16384 }), lp.encode(), conn)
 
     let connected = false
-    ma = multiaddr(ma)
     channel.on('signal', (signal) => {
+      // TODO: allow dialing on specific transports
       const addr = multiaddr(`/p2p-circuit`).encapsulate(`/ipfs/${ma.getPeerId()}`)
       this._libp2p.dialProtocol(addr, multicodec, (err, conn) => {
         if (err) {

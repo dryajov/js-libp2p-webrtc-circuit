@@ -11,5 +11,4 @@ message WebRTCCircuit {
 
   optional bytes signal = 1;
   optional Status code = 2;
-}
-`)
+}`)

@@ -6,24 +6,44 @@ const dirtyChai = require('dirty-chai')
 const expect = chai.expect
 chai.use(dirtyChai)
 
-const multiaddr = require('multiaddr')
+const pair = require('pull-pair/duplex')
 const pull = require('pull-stream')
+const Connection = require('interface-connection').Connection
+const series = require('async/series')
 
-const WebRTCDirect = require('../src')
+const WebRTCCirctuit = require('../src')
 
 describe('valid Connection', () => {
-  const ma = multiaddr('/ip4/127.0.0.1/tcp/12345/http/p2p-webrtc-direct')
-  let wd
+  const ma = '/p2p-webrtc-circuit/ipfs/QmSswe1dCFRepmhjAMR5VfHeokGLcvVggkuDJm7RMfJSrE'
   let conn
 
-  before((done) => {
-    wd = new WebRTCDirect()
+  let wrtc1
+  let wrtc2
+  let node
+  let stream
+  beforeEach(function (done) {
+    stream = pair()
+    node = {
+      dialProtocol: (addr, multicodec, callback) => {
+        callback(null, new Connection(stream[0]))
+      },
+      handle: (multicodec, callback) => {
+        callback(null, new Connection(stream[1]))
+      }
+    }
 
-    wd.dial(ma, (err, _conn) => {
-      expect(err).to.not.exist()
-      conn = _conn
-      done()
-    })
+    wrtc1 = new WebRTCCirctuit(node)
+    wrtc2 = new WebRTCCirctuit(node)
+
+    const listener = wrtc2.createListener()
+    series([
+      (cb) => listener.listen(ma, cb),
+      (cb) => wrtc1.dial(ma, (err, _conn) => {
+        expect(err).to.not.exist()
+        conn = _conn
+        cb()
+      })
+    ], done)
   })
 
   after((done) => {

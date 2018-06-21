@@ -43,8 +43,8 @@ describe('dial', () => {
         pull.collect((err, data) => {
           expect(err).to.not.exist()
           expect(data.toString()).to.equal('Hello!')
-          done()
-        })
+        }),
+        pull.onEnd(done)
       )
     })
 
