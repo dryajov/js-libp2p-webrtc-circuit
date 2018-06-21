@@ -13,15 +13,15 @@ const pair = require('pull-pair/duplex')
 const series = require('async/series')
 
 const WebRTCCirctuit = require('../src')
-const proto = require('../src/proto')
 const ErrorCodes = require('../src/errcodes')
 
-describe.only('dial', () => {
+describe('dial', () => {
   let wrtc1
   let wrtc2
   let node
-  let stream = pair()
+  let stream
   beforeEach(function () {
+    stream = pair()
     node = {
       dialProtocol: (addr, multicodec, callback) => {
         callback(null, new Connection(stream[0]))

@@ -15,8 +15,7 @@ const block = require('pull-block')
 const lp = require('pull-length-prefixed')
 const pb = require('pull-protocol-buffers')
 
-const protons = require('protons')
-const proto = protons(require('./proto'))
+const proto = require('./proto')
 
 function noop () { }
 
@@ -51,6 +50,8 @@ class WebRTCCircuit {
 
     const channel = new SimplePeer(options)
     const conn = new Connection(toPull.duplex(channel))
+    // chunk into 16kb size
+    // TODO: make chunking configurable
     pull(conn, block({ size: 16384 }), lp.encode(), conn)
 
     let connected = false
