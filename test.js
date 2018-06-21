@@ -8,7 +8,7 @@ const PeerId = require('peer-id')
 const id = require('./test/peer')
 
 let libp2pNode
-function boot(done) {
+function boot (done) {
   PeerId.createFromJSON(id, (err, peerId) => {
     if (err) { return done(err) }
     utils.createNode(peerId,
@@ -41,7 +41,7 @@ function boot(done) {
   })
 }
 
-function shutdown(done) {
+function shutdown (done) {
   libp2pNode.stop(() => {
     console.log('Stopped!')
   })
