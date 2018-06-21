@@ -70,7 +70,7 @@ function makeWrtcDirectNode (addrs, callback) {
   createNode(addrs, {
     modules: {
       transport: [
-        isNode ? new WS() : undefined
+        new WS()
       ]
     },
     relay: {

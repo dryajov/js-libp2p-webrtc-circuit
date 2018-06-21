@@ -7,57 +7,71 @@ const dirtyChai = require('dirty-chai')
 const expect = chai.expect
 chai.use(dirtyChai)
 
-const multiaddr = require('multiaddr')
 const pull = require('pull-stream')
+const Connection = require('interface-connection').Connection
+const pair = require('pull-pair/duplex')
 const series = require('async/series')
 
-const utils = require('./utils')
+const WebRTCCirctuit = require('../src')
+const proto = require('../src/proto')
+const ErrorCodes = require('../src/errcodes')
 
 describe.only('dial', () => {
   let wrtc1
   let wrtc2
-  before(function (done) {
-    this.timeout(50 * 1000)
-    series([
-      (cb) => utils.makeWrtcDirectNode(['/ip4/0.0.0.0/tcp/0/ws/p2p-webrtc-circuit'], cb),
-      (cb) => utils.makeWrtcDirectNode(['/ip4/0.0.0.0/tcp/0/ws/p2p-webrtc-circuit'], cb),
-      (cb) => setTimeout(cb, 2000)
-    ], (err, nodes) => {
-      expect(err).to.not.exist()
-      wrtc1 = nodes[0]
-      wrtc2 = nodes[1]
-      done()
-    })
+  let node
+  let stream = pair()
+  beforeEach(function () {
+    node = {
+      dialProtocol: (addr, multicodec, callback) => {
+        callback(null, new Connection(stream[0]))
+      },
+      handle: (multicodec, callback) => {
+        callback(null, new Connection(stream[1]))
+      }
+    }
+
+    wrtc1 = new WebRTCCirctuit(node)
+    wrtc2 = new WebRTCCirctuit(node)
   })
 
-  it.only('dial webrtc circuit address', function (done) {
-    this.timeout(10000 * 1000)
-    const ma = multiaddr(`/p2p-webrtc-circuit/ipfs/${wrtc2.peerInfo.id.toB58String()}`)
-    wrtc1.dial(ma, (err, conn) => {
-      expect(err).to.not.exist()
-      const data = Buffer.from('some data')
+  it('should negotiate webrtc', function (done) {
+    this.timeout(1000 * 1000)
+    const listener = wrtc2.createListener((conn) => {
       pull(
-        pull.values([data]),
         conn,
-        pull.collect((err, values) => {
+        pull.collect((err, data) => {
           expect(err).to.not.exist()
-          expect(values).to.eql([data])
+          expect(data.toString()).to.equal('Hello!')
           done()
         })
       )
     })
+
+    series([
+      (cb) => listener.listen('/p2p-webrtc-circuit/ipfs/QmSswe1dCFRepmhjAMR5VfHeokGLcvVggkuDJm7RMfJSrE', cb),
+      (cb) => wrtc1.dial('/p2p-webrtc-circuit/ipfs/QmYJjAri5soV8RbeQcHaYYcTAYTET17QTvcoFMyKvRDTXe', (err, conn) => {
+        expect(err).to.not.exist()
+        pull(
+          pull.values([Buffer.from('Hello!')]),
+          conn
+        )
+        cb()
+      })
+    ], done)
   })
 
-  it('dial offline / non-existent node on IPv4, check callback', (done) => {
-    let maOffline = multiaddr('/ip4/127.0.0.1/tcp/55555/http/p2p-webrtc-direct')
-
-    wd.dial(maOffline, (err, conn) => {
-      expect(err).to.exist()
-      done()
-    })
-  })
-
-  it.skip('dial on IPv6', (done) => {
-    // TODO IPv6 not supported yet
+  it('should reject connection on max connections exceeded', function (done) {
+    this.timeout(1000 * 1000)
+    const listener = wrtc2.createListener()
+    wrtc2.maxCons = 0
+    series([
+      (cb) => listener.listen('/p2p-webrtc-circuit/ipfs/QmSswe1dCFRepmhjAMR5VfHeokGLcvVggkuDJm7RMfJSrE', cb),
+      (cb) => wrtc1.dial('/p2p-webrtc-circuit/ipfs/QmYJjAri5soV8RbeQcHaYYcTAYTET17QTvcoFMyKvRDTXe', (err) => {
+        expect(err).to.exist()
+        expect(err.message).to.eql(ErrorCodes[100])
+        cb()
+      })
+    ], done)
   })
 })

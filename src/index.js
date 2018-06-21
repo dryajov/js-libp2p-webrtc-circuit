@@ -11,14 +11,25 @@ const once = require('once')
 const withIs = require('class-is')
 const pull = require('pull-stream')
 const multiaddr = require('multiaddr')
-const through = require('pull-through')
+const block = require('pull-block')
+const lp = require('pull-length-prefixed')
+const pb = require('pull-protocol-buffers')
+
+const protons = require('protons')
+const proto = protons(require('./proto'))
 
 function noop () { }
 
 const multicodec = '/libp2p/webrtc/circuit/1.0.1'
+
+const ErrorMsgs = require('./errcodes')
+
 class WebRTCCircuit {
-  constructor (libp2p) {
+  constructor (libp2p, maxCons) {
     this._libp2p = libp2p
+    this.maxCons = isNode ? 50 : 5
+    this.maxCons = maxCons || this.maxCons
+    this.totalCons = 0
   }
 
   dial (ma, options, callback) {
@@ -29,7 +40,7 @@ class WebRTCCircuit {
 
     callback = once(callback || noop)
 
-    Object.assign(options, {
+    options = Object.assign({}, options, {
       initiator: true,
       trickle: false
     })
@@ -40,8 +51,10 @@ class WebRTCCircuit {
 
     const channel = new SimplePeer(options)
     const conn = new Connection(toPull.duplex(channel))
+    pull(conn, block({ size: 16384 }), lp.encode(), conn)
 
     let connected = false
+    ma = multiaddr(ma)
     channel.on('signal', (signal) => {
       const addr = multiaddr(`/p2p-circuit`).encapsulate(`/ipfs/${ma.getPeerId()}`)
       this._libp2p.dialProtocol(addr, multicodec, (err, conn) => {
@@ -50,11 +63,22 @@ class WebRTCCircuit {
         }
 
         pull(
-          pull.values([JSON.stringify(signal)]),
+          pull.values([{signal: JSON.stringify(signal)}]),
+          pb.encode(proto.WebRTCCircuit),
           conn,
+          pb.decode(proto.WebRTCCircuit),
           pull.collect((err, signal) => {
             if (err) { return callback(err) }
-            channel.signal(JSON.parse(signal))
+            if (signal[0].code !== proto.WebRTCCircuit.Status.OK) {
+              return callback(new Error(ErrorMsgs[signal[0].code]))
+            }
+
+            try {
+              channel.signal(signal[0].signal.toString())
+              this.totalCons++
+            } catch (err) {
+              return callback(err)
+            }
           })
         )
       })
@@ -69,7 +93,10 @@ class WebRTCCircuit {
     conn.getObservedAddrs = (callback) => callback(null, [ma])
 
     channel.on('timeout', () => callback(new Error('timeout')))
-    channel.on('close', () => conn.destroy())
+    channel.on('close', () => {
+      conn.destroy()
+      this.totalCons--
+    })
     channel.on('error', (err) => {
       if (!connected) {
         callback(err)
@@ -90,11 +117,18 @@ class WebRTCCircuit {
     listener.listen = (ma, callback) => {
       callback = callback || noop
 
-      maSelf = ma
+      maSelf = multiaddr(ma)
       this._libp2p.handle(multicodec, (_, conn) => {
         pull(
           conn,
-          through(function (signal) {
+          pb.decode(proto.WebRTCCircuit),
+          pull.asyncMap((msg, cb) => {
+            if (this.maxCons <= this.totalCons) {
+              return cb(null, {
+                code: proto.WebRTCCircuit.Status.E_MAX_CONN_EXCEEDED
+              })
+            }
+
             const options = {
               trickle: false
             }
@@ -113,11 +147,27 @@ class WebRTCCircuit {
             })
 
             channel.on('signal', (signal) => {
-              this.queue(JSON.stringify(signal))
+              try {
+                this.totalCons++
+                cb(null, {
+                  signal: JSON.stringify(signal),
+                  code: proto.WebRTCCircuit.Status.OK
+                })
+              } catch (err) {
+                return callback(err)
+              }
             })
 
-            channel.signal(JSON.parse(signal))
+            channel.on('close', () => {
+              cb(null, {
+                code: proto.WebRTCCircuit.Status.E_INTERNAL_ERR
+              })
+              this.totalCons--
+            })
+
+            channel.signal(msg.signal.toString())
           }),
+          pb.encode(proto.WebRTCCircuit),
           conn
         )
       })
