@@ -65,7 +65,6 @@
     "concat-stream": "^1.6.2",
     "detect-node": "^2.0.3",
     "interface-connection": "~0.3.2",
-    "mafmt": "^6.0.0",
     "multibase": "~0.4.0",
     "once": "^1.4.0",
     "protons": "^1.0.1",
@@ -77,6 +76,8 @@
     "request": "^2.85.0",
     "simple-peer": "9.0.0",
     "stream-to-pull-stream": "^1.7.2",
-    "wrtc": "0.1.1"
+    "wrtc": "0.1.1",
+    "mafmt": "dryajov/js-mafmt",
+    "multiaddr": "dryajov/js-multiaddr"
   }
 }
