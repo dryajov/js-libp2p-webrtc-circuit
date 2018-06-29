@@ -16,6 +16,7 @@ const WebRTCCirctuit = require('../src')
 const ErrorCodes = require('../src/errcodes')
 
 describe('dial', () => {
+  const ma = '/p2p-webrtc-circuit/ipfs/QmSswe1dCFRepmhjAMR5VfHeokGLcvVggkuDJm7RMfJSrE'
   let wrtc1
   let wrtc2
   let node
@@ -49,8 +50,8 @@ describe('dial', () => {
     })
 
     series([
-      (cb) => listener.listen('/p2p-webrtc-circuit/ipfs/QmSswe1dCFRepmhjAMR5VfHeokGLcvVggkuDJm7RMfJSrE', cb),
-      (cb) => wrtc1.dial('/p2p-webrtc-circuit/ipfs/QmYJjAri5soV8RbeQcHaYYcTAYTET17QTvcoFMyKvRDTXe', (err, conn) => {
+      (cb) => listener.listen(ma, cb),
+      (cb) => wrtc1.dial(ma, (err, conn) => {
         expect(err).to.not.exist()
         pull(
           pull.values([Buffer.from('Hello!')]),
@@ -66,8 +67,8 @@ describe('dial', () => {
     const listener = wrtc2.createListener()
     wrtc2.maxCons = 0
     series([
-      (cb) => listener.listen('/p2p-webrtc-circuit/ipfs/QmSswe1dCFRepmhjAMR5VfHeokGLcvVggkuDJm7RMfJSrE', cb),
-      (cb) => wrtc1.dial('/p2p-webrtc-circuit/ipfs/QmYJjAri5soV8RbeQcHaYYcTAYTET17QTvcoFMyKvRDTXe', (err) => {
+      (cb) => listener.listen(ma, cb),
+      (cb) => wrtc1.dial(ma, (err) => {
         expect(err).to.exist()
         expect(err.message).to.eql(ErrorCodes[100])
         cb()

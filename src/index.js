@@ -15,6 +15,11 @@ const block = require('pull-block')
 const lp = require('pull-length-prefixed')
 const pb = require('pull-protocol-buffers')
 
+const debug = require('debug')
+
+const log = debug('libp2p:webrtc-circuit')
+log.err = debug('libp2p:webrtc-circuit:err')
+
 const proto = require('./proto')
 
 function noop () { }
@@ -39,9 +44,11 @@ class WebRTCCircuit {
 
     ma = multiaddr(ma)
     if (!ma.getPeerId()) {
+      log.err('/ipfs/<id> is required!')
       return callback(new Error('/ipfs/<id> is required!'))
     }
 
+    log(`dialing ${ma.toString()}`)
     callback = once(callback || noop)
 
     options = Object.assign({}, options, {
@@ -74,7 +81,10 @@ class WebRTCCircuit {
           conn,
           pb.decode(proto.WebRTCCircuit),
           pull.collect((err, signal) => {
-            if (err) { return callback(err) }
+            if (err) {
+              log.err(err)
+              return callback(err)
+            }
             if (signal[0].code !== proto.WebRTCCircuit.Status.OK) {
               return callback(new Error(ErrorMsgs[signal[0].code]))
             }
@@ -124,6 +134,7 @@ class WebRTCCircuit {
       callback = callback || noop
 
       maSelf = multiaddr(ma)
+      log(`listening on ${maSelf.toString()}`)
       this._libp2p.handle(multicodec, (_, conn) => {
         pull(
           conn,
@@ -160,6 +171,7 @@ class WebRTCCircuit {
                   code: proto.WebRTCCircuit.Status.OK
                 })
               } catch (err) {
+                log.err(err)
                 return callback(err)
               }
             })
@@ -171,6 +183,7 @@ class WebRTCCircuit {
               this.totalCons--
             })
 
+            log(`got signal: ${msg.signal.toString()}`)
             channel.signal(msg.signal.toString())
           }),
           pb.encode(proto.WebRTCCircuit),
@@ -221,5 +234,5 @@ class WebRTCCircuit {
 
 module.exports = withIs(WebRTCCircuit, {
   className: 'WebRTCCircuit',
-  symbolName: '@libp2p/js-libp2p-webrtc-direct/webrtccircuit'
+  symbolName: '@libp2p/js-libp2p-webrtc-circuit/webrtccircuit'
 })

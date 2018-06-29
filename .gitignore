@@ -2,6 +2,7 @@
 **/*.log
 test/repo-tests*
 **/bundle.js
+.vscode
 
 # Logs
 logs
