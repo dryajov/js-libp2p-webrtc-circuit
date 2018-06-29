@@ -31,7 +31,7 @@ const ErrorMsgs = require('./errcodes')
 class WebRTCCircuit {
   constructor (libp2p, maxCons) {
     this._libp2p = libp2p
-    this.maxCons = isNode ? 50 : 5
+    this.maxCons = isNode ? 50 : 4
     this.maxCons = maxCons || this.maxCons
     this.totalCons = 0
   }
