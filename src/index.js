@@ -102,6 +102,7 @@ class WebRTCCircuit {
 
     channel.on('connect', () => {
       connected = true
+      log('dialer connected')
       callback(null, conn)
     })
 
@@ -158,6 +159,7 @@ class WebRTCCircuit {
             const conn = new Connection(toPull.duplex(channel))
 
             channel.on('connect', () => {
+              log('listener connected')
               conn.getObservedAddrs = (callback) => callback(null, [])
               listener.emit('connection', conn)
               handler(conn)
