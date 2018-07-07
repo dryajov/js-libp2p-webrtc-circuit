@@ -32,8 +32,10 @@ describe('valid Connection', () => {
       }
     }
 
-    wrtc1 = new WebRTCCirctuit(node)
+    wrtc1 = new WebRTCCirctuit()
+    wrtc1.init(node)
     wrtc2 = new WebRTCCirctuit(node)
+    wrtc2.init(node)
 
     const listener = wrtc2.createListener()
     series([

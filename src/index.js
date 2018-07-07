@@ -29,11 +29,15 @@ const multicodec = '/libp2p/webrtc/circuit/1.0.1'
 const ErrorMsgs = require('./errcodes')
 
 class WebRTCCircuit {
-  constructor (libp2p, maxCons) {
-    this._libp2p = libp2p
+  constructor (maxCons) {
+    this._libp2p = null
     this.maxCons = isNode ? 50 : 4
     this.maxCons = maxCons || this.maxCons
     this.totalCons = 0
+  }
+
+  init (libp2p) {
+    this._libp2p = libp2p
   }
 
   dial (ma, options, callback) {

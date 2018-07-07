@@ -32,8 +32,10 @@ describe('dial', () => {
       }
     }
 
-    wrtc1 = new WebRTCCirctuit(node)
+    wrtc1 = new WebRTCCirctuit()
+    wrtc1.init(node)
     wrtc2 = new WebRTCCirctuit(node)
+    wrtc2.init(node)
   })
 
   it('should negotiate webrtc', function (done) {
