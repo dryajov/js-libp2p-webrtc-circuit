@@ -33,9 +33,9 @@ describe('valid Connection', () => {
     }
 
     wrtc1 = new WebRTCCirctuit()
-    wrtc1.init(node)
+    wrtc1.setLibp2p(node)
     wrtc2 = new WebRTCCirctuit(node)
-    wrtc2.init(node)
+    wrtc2.setLibp2p(node)
 
     const listener = wrtc2.createListener()
     series([

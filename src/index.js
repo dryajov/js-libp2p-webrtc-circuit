@@ -36,7 +36,7 @@ class WebRTCCircuit {
     this.totalCons = 0
   }
 
-  init (libp2p) {
+  setLibp2p (libp2p) {
     this._libp2p = libp2p
   }
 
@@ -68,7 +68,7 @@ class WebRTCCircuit {
     const conn = new Connection(toPull.duplex(channel))
     // chunk into 16kb size
     // TODO: make chunking configurable
-    pull(conn, block({ size: 16384 }), lp.encode(), conn)
+    // pull(conn, block({ size: 16384 }), lp.encode(), conn)
 
     let connected = false
     channel.on('signal', (signal) => {
