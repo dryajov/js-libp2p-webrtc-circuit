@@ -29,7 +29,7 @@ const multicodec = '/libp2p/webrtc/circuit/1.0.1'
 const ErrorMsgs = require('./errcodes')
 
 class WebRTCCircuit {
-  constructor (maxCons, maxPeers) {
+  constructor (maxCons) {
     this._libp2p = null
     this.maxCons = isNode ? 50 : 4
     this.maxCons = maxCons || this.maxCons
