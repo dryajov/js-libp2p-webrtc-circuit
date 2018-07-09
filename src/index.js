@@ -238,7 +238,8 @@ class WebRTCCircuit {
   }
 }
 
-module.exports = withIs(WebRTCCircuit, {
+exports = module.exports = withIs(WebRTCCircuit, {
   className: 'WebRTCCircuit',
   symbolName: '@libp2p/js-libp2p-webrtc-circuit/webrtccircuit'
 })
+exports.tag = 'webrtccircuit'
