@@ -29,7 +29,7 @@ const multicodec = '/libp2p/webrtc/circuit/1.0.1'
 const ErrorMsgs = require('./errcodes')
 
 class WebRTCCircuit {
-  constructor (maxCons) {
+  constructor (maxCons, maxPeers) {
     this._libp2p = null
     this.maxCons = isNode ? 50 : 4
     this.maxCons = maxCons || this.maxCons
@@ -44,6 +44,10 @@ class WebRTCCircuit {
     if (typeof options === 'function') {
       callback = options
       options = {}
+    }
+
+    if (this.maxCons <= this.totalCons) {
+      return callback(new Error(ErrorMsgs[proto.WebRTCCircuit.Status.E_MAX_CONN_EXCEEDED]))
     }
 
     ma = multiaddr(ma)
