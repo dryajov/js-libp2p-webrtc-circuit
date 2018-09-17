@@ -1,6 +1,6 @@
 {
   "name": "libp2p-webrtc-circuit",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Use a relayed connection to negotiate a webrtc connection.",
   "main": "src/index.js",
   "browser": {
