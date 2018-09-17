@@ -1,0 +1,11 @@
+patch-package
+--- a/node_modules/multiaddr/src/protocols-table.js
++++ b/node_modules/multiaddr/src/protocols-table.js
+@@ -44,6 +44,7 @@ Protocols.table = [
+   [479, 0, 'p2p-websocket-star'],
+   [275, 0, 'p2p-webrtc-star'],
+   [276, 0, 'p2p-webrtc-direct'],
++  [277, 0, 'p2p-webrtc-circuit'],
+   [290, 0, 'p2p-circuit']
+ ]
+ 

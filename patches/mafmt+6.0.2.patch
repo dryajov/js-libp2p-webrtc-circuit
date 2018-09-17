@@ -1,0 +1,36 @@
+patch-package
+--- a/node_modules/mafmt/src/index.js
++++ b/node_modules/mafmt/src/index.js
+@@ -14,10 +14,7 @@ const _DNS = or(
+ )
+ 
+ const IP = or(base('ip4'), base('ip6'))
+-const TCP = or(
+-  and(IP, base('tcp')),
+-  and(_DNS, base('tcp'))
+-)
++const TCP = and(IP, base('tcp'))
+ const UDP = and(IP, base('udp'))
+ const UTP = and(UDP, base('utp'))
+ 
+@@ -77,6 +74,12 @@ const Reliable = or(
+   UTP
+ )
+ 
++const WebRTCCircuit = or(
++  and(Reliable, base('p2p-webrtc-circuit'), base('ipfs')),
++  and(base('p2p-webrtc-circuit'), base('ipfs')),
++  and(base('ipfs'), base('p2p-webrtc-circuit'))
++)
++
+ let _IPFS = or(
+   and(Reliable, base('ipfs')),
+   WebRTCStar,
+@@ -121,6 +124,7 @@ exports.WebSocketsSecure = WebSocketsSecure
+ exports.WebSocketStar = WebSocketStar
+ exports.WebRTCStar = WebRTCStar
+ exports.WebRTCDirect = WebRTCDirect
++exports.WebRTCCircuit = WebRTCCircuit
+ exports.Reliable = Reliable
+ exports.Circuit = Circuit
+ exports.IPFS = IPFS
