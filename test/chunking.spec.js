@@ -12,7 +12,7 @@ const pull = require('pull-stream')
 const Connection = require('interface-connection').Connection
 const pair = require('pull-pair/duplex')
 const series = require('async/series')
-const randomSplit = require('pull-randomly-split')
+// const randomSplit = require('pull-randomly-split')
 
 const WebRTCCirctuit = require('../src')
 

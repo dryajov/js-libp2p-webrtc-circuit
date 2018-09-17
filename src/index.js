@@ -11,8 +11,6 @@ const once = require('once')
 const withIs = require('class-is')
 const pull = require('pull-stream')
 const multiaddr = require('multiaddr')
-const block = require('pull-block')
-const lp = require('pull-length-prefixed')
 const pb = require('pull-protocol-buffers')
 
 const debug = require('debug')
