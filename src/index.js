@@ -135,6 +135,8 @@ class WebRTCCircuit {
       options = {}
     }
 
+    handler = handler || noop
+
     let maSelf
     const listener = new EE()
     listener.listen = (ma, callback) => {
