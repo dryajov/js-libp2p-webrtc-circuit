@@ -1,6 +1,6 @@
 {
   "name": "libp2p-webrtc-circuit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Use a relayed connection to negotiate a webrtc connection.",
   "main": "src/index.js",
   "browser": {
@@ -25,7 +25,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/libp2p/js-libp2p-webrtc-circuit.git"
+    "url": "git+https://github.com/dryajov/js-libp2p-webrtc-circuit.git"
   },
   "keywords": [
     "libp2p",
