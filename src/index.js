@@ -169,8 +169,8 @@ class WebRTCCircuit {
             channel.on('connect', () => {
               log('listener connected')
               conn.getObservedAddrs = (callback) => callback(null, [])
-              listener.emit('connection', conn)
-              handler(conn)
+              setImmediate(() => listener.emit('connection', conn))
+              setImmediate(() => handler(conn))
             })
 
             channel.on('signal', (signal) => {

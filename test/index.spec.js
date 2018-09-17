@@ -40,15 +40,15 @@ describe('webrct', () => {
     wrtc2.setLibp2p(node)
   })
 
-  it('should negotiate webrtc', function (done) {
+  it('should negotiate wrtc', function (done) {
+    this.timeout(500000)
     const listener = wrtc2.createListener((conn) => {
       pull(
         conn,
         pull.collect((err, data) => {
           expect(err).to.not.exist()
           expect(data.toString()).to.equal('Hello!')
-        }),
-        pull.onEnd(done)
+        })
       )
     })
 
